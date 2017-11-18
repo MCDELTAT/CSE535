@@ -15,18 +15,44 @@ iteration = 1000;                                                               
 W = 2 * rand((x*y), rank);                                                                  % initialize W, H (1c)
 H = 2 * rand(rank, z); 
 
+% Honestly couldn't figure out algorithm used in book. This is ALS
+% algorithm taken from implementation found in nnmf(). Just needed
+% something working to do the other parts.
+tolx = 1e-4
+tolfun = 1e-4;
+nm = numel(V);
+sqrteps = sqrt(eps);
+w0 = rand(1024, 16);
+h0 = rand(16, 69);
 for ii = 1:iteration
-    % Lee and Seung's Muplicative Update Rule
-    % H[ij] = H[ij]*((W^T*V)[ij]/(W^T*W*H)[ij])
-    % W[ij] = W[ij]*((V*H^T)[ij]/(W^T*W*H)[ij])
+    % updating rules for W, H (1e)
     
-    x1=repmat(sum(W,1)', 1, z);                                                             % updating rules for W, H (1e)
-    H=H.*(W'*(V./(W*H)))./x1;
-    x2=repmat(sum(H,2)', (x*y), 1);
-    W=W.*((V./(W*H))*H')./x2;
+    % Alternating least squares
+    H = max(0, w0\V);
+    W = max(0, V/H);
     
-    % check for convergence/stability to see if we can save CPU cycles
+    % Get norm of difference and max change in factors
+    d = V - W*H;
+    dnorm = sqrt(sum(sum(d.^2))/nm);
+    dw = max(max(abs(W-w0) / (sqrteps+max(max(abs(w0))))));
+    dh = max(max(abs(H-h0) / (sqrteps+max(max(abs(h0))))));
+    delta = max(dw,dh);
     
+    % Check for convergence
+    if j>1
+        if delta <= tolx
+            break;
+        elseif dnorm0-dnorm <= tolfun*max(1,dnorm0)
+            break;
+        elseif j==iteration
+            break
+        end
+    end
+
+    % Remember previous iteration results
+    dnorm0 = dnorm;
+    w0 = W;
+    h0 = H;
 end
 
 figure(111)
@@ -35,13 +61,16 @@ for mm = 1:rank                                                                 
 end
 
 % Show Factor W
-figure(Factor W)
+figure(112)
 for mm = 1:rank
-    
+    % reshape each column vector into 32x32 matrix
+    reW = reshape(W(1:1024, mm), [32, 32]);
+    subplot(sqrt(rank), sqrt(rank), mm);imshow(reW(:,mm));
 end    
 
 % Show Factor H
-
+figure(113)
+subplot(sqrt(rank), sqrt(rank), rank);imshow(H(:,:));
 
 % 
 % figure(222)
