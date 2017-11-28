@@ -1,9 +1,16 @@
 clc; clear all; close all;
 
-set1folder = fullfile(pwd,'att_faces\s1');
-set2folder = fullfile(pwd,'att_faces\s2');
-set3folder = fullfile(pwd,'att_faces\s3');
-set4folder = fullfile(pwd,'att_faces\s4');
+if ispc % For if the machine is Windows and uses the back slash pathing
+    set1folder = fullfile(pwd,'att_faces\s1');
+    set2folder = fullfile(pwd,'att_faces\s2');
+    set3folder = fullfile(pwd,'att_faces\s3');
+    set4folder = fullfile(pwd,'att_faces\s4');
+else % for any Unix/Linux system that uses forward slashes     
+    set1folder = fullfile(pwd,'att_faces/s1');
+    set2folder = fullfile(pwd,'att_faces/s2');
+    set3folder = fullfile(pwd,'att_faces/s3');
+    set4folder = fullfile(pwd,'att_faces/s4');
+end    
 
 persons = 4; %how many rows of data of different people
 quantity = 5; %how many columns of the same person
