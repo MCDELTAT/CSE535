@@ -105,7 +105,7 @@ title('r2')
 %subplot(2,2,3);
 %pcolor(flipud(r3)), shading interp, colormap(gray)
 %title('r3')
-Vec=reshape(r2,1,112,92);
+Vec=reshape(r2,1,112*92);
 projrec=Vec*V;
 
 for i = 1:c
